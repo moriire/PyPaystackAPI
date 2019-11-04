@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from private import config
-import os, requests
+import requests
 GET, POST, url= requests.get, requests.post, config.url
 headers={"Authorization":"Bearer" +" " + config.secret_key, "Content-Type": "application/json"}
 class Transaction:
@@ -19,7 +19,7 @@ class Transaction:
         callback_url(string) --> None: url to redirect to after successful transaction
         """
         data={"amount": amount, "email": email, "first_name":first_name, "last_name":last_name,'callback_url':callback_url}
-        request=POST(os.path.join(self.url, end_point), headers=self.headers, json=data)
+        request=POST(self.url + end_point, headers=self.headers, json=data)
         response=request.json()
         return response['status'], response['data']['authorization_url'], response['data']['reference']
 
@@ -31,7 +31,7 @@ class Transaction:
         ref: reference code
         ref(string) --> Unique transaction reference. It is a one-time key generated after initializing transaction.
         """
-        request=GET(os.path.join(self.url, end_point, ref), headers=headers)
+        request=GET(self.url+end_point+ref, headers=headers)
         data=request.json()
         return data['status'], data['data']['status']
     
@@ -47,7 +47,7 @@ class Transaction:
         fetch(transaction_id)--> Retrieves a single transactions 
         """
         if transaction_id:
-            request=GET(os.path.join(self.url,transaction_id), headers=headers)
+            request=GET(self.url+transaction_id, headers=headers)
             data=request.json()
             return data
         else:
